@@ -135,7 +135,19 @@ python3 extended_tests.py
 
 Both scripts print the results and automatically update the corresponding CSV tables in the `results/` folder.
 
-## 5. Considerations
+## 5. Tried Alternatives
+
+During development, I also tried a few additional strategies that were not kept in the final version because they did not improve the main benchmark consistently.
+
+One attempt was to make the randomized exploration stronger by increasing the number of random starts and by adding more noise to the savings values. This sometimes produced slightly different routes, but it did not improve the main tests in a stable way, and in some cases it only increased the running time.
+
+I also tested wider sweep group sizes and longer maximum route lengths. The idea was to allow the solver to build larger routes and explore more global combinations. In practice, the useful merges were already captured by the smaller route limits, while larger routes often carried too much gold for too long or simply did not change the final solution.
+
+Another idea was to add more aggressive local search moves, such as splitting cities out of existing routes, exact reordering of short routes, and additional merge passes after local search. These variants were useful as experiments, but they either left the main results unchanged or slightly worsened some `beta == 1` cases.
+
+Finally, I tried reducing the internal time budgets to make the solver faster. This worked only for some cases, but on the large linear instances it could stop the local search one improvement too early. For this reason, the final code keeps the safer time settings for `beta == 1`, while avoiding an unnecessary second validation pass only for the convex `beta > 1` paths.
+
+## 6. Considerations
 
 The algorithm performs especially well when `beta > 1`, because the convex cost makes load splitting very effective. In those cases, the improvement over the baseline is consistently very high. The trade-off is that the returned paths become longer, because the thief deliberately performs many lighter trips instead of carrying large loads.
 
